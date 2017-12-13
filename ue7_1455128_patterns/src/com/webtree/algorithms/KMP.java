@@ -1,57 +1,61 @@
 package com.webtree.algorithms;
 
 public class KMP {
-    private static int[] failure;
     private static int count;
 
     public static Result search(String pattern, String text) throws IllegalArgumentException {
         if (pattern == null || text == null)
             throw new IllegalArgumentException("Provide pattern and/or text you want to search");
+        int pLength = pattern.length();
+        int tLength = text.length();
+        int index = 0;
+        int lmp[] = new int[pLength]; //lmp = longest matching Prefix
+        int j = 0, i = 0; //index for pattern, index for text
 
-        failure = new int[pattern.length()];
-        failFunction(pattern);
-        int index = positionMatch(text, pattern);
+        getLMP(pattern, pLength, lmp);
 
-        if (index == -1) {
-            return new Result(-1, 0);
-        } else {
-            System.out.println("Pattern at index " + index + " Pattern found: " + count + " times.");
-            return new Result(index, count);
-        }
-    }
-
-    private static int positionMatch(String text, String pattern) {
-        int i = 0, j = 0;
-        int stringLength = text.length();
-        int patternLength = pattern.length();
-
-        while (i < stringLength) {
-            j = 0;
-            while (i < stringLength && j < patternLength) {
-                if (text.charAt(i) == pattern.charAt(j)) {
-                    i++;
-                    j++;
-                } else if (j == 0)
-                    i++;
-                else
-                    j = failure[j - 1] + 1;
+        while (i < tLength) {
+            if (pattern.charAt(j) == text.charAt(i)) {
+                i++;
+                j++;
             }
-            count++;
+            if (j == pLength) {
+                count++;
+                index = i-j;
+                j = lmp[j-1];
+            } else if (i < tLength && pattern.charAt(j) != text.charAt(i)) {
+                if (j != 0) {
+                    j = lmp[j - 1];
+                } else {
+                    i = i + 1;
+                }
+            }
         }
-        return ((count != 0) ? (i - patternLength) : -1);
+        //System.out.println(count + " patterns found. Last at index: " + index);
+        return new Result(index, count);
     }
 
-    private static void failFunction(String pattern) {
-        int n = pattern.length();
-        failure[0] = -1;
-        for (int j = 1; j < n; j++) {
-            int i = failure[j - 1];
-            while ((pattern.charAt(j) != pattern.charAt(i + 1)) && i >= 0)
-                i = failure[i];
-            if (pattern.charAt(j) == pattern.charAt(i + 1))
-                failure[j] = i + 1;
-            else
-                failure[j] = -1;
+    private static void getLMP(String pattern, int pLength, int lmp[]) {
+        int length = 0;
+        int i = 1;
+        lmp[0] = 0;
+
+        while (i < pLength) {
+            if (pattern.charAt(i) == pattern.charAt(length)) {
+                length++;
+                lmp[i] = length;
+                i++;
+            } else {
+                if (length != 0) {
+                    length = lmp[length - 1];
+                } else {
+                    lmp[i] = length;
+                    i++;
+                }
+            }
+
         }
     }
+
+
 }

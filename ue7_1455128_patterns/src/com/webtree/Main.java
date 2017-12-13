@@ -6,6 +6,7 @@ public class Main {
 
     public static void main(String[] args) {
 	// write your code here
-        KMP.search("xxx", "abcdexxxunbxxxxke");
+        //KMP.search("xxx", "abcdexxxunbxxxxke");
+        System.out.println(KMP.search("xxx", "abcdexxxunbxxxxke"));
     }
 }
